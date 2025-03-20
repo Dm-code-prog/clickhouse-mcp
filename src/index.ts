@@ -6,6 +6,7 @@ import fs from "fs";
 import { z } from "zod";
 
 import { env } from "./env.js";
+import { NodeClickHouseClientConfigOptions } from "@clickhouse/client/dist/client.js";
 
 /**
  * Start the ClickHouse MCP server
@@ -22,7 +23,7 @@ export function startServer() {
         username: env.CLICKHOUSE_USER,
         password: env.CLICKHOUSE_PASSWORD,
         database: env.CLICKHOUSE_DATABASE,
-        url: `https://${env.CLICKHOUSE_HOST}:${env.CLICKHOUSE_PORT}`,
+        host: `https://${env.CLICKHOUSE_HOST}:${env.CLICKHOUSE_PORT}`,
         request_timeout: env.CLICKHOUSE_CONNECT_TIMEOUT_SEC * 1000,
         compression: {
             response: true,
@@ -34,9 +35,7 @@ export function startServer() {
         clickhouse_settings: {
             readonly: "1"
         }
-    } satisfies ClickHouseClientConfigOptions);
-
-
+    } satisfies NodeClickHouseClientConfigOptions);
 
     client.ping().catch((err) => {
         console.error({
@@ -46,8 +45,6 @@ export function startServer() {
         });
         process.exit(1);
     });
-
-
 
     server.tool(
         "list_databases",
@@ -62,6 +59,7 @@ export function startServer() {
 
             const databases = await result.json();
 
+            /** @ts-ignore */
             const foundDatabases = `Found the following databases on the ClickHouse server: ${databases.data.map((db: any) => db.name).join(", ")}`;
 
             return {
@@ -89,7 +87,8 @@ export function startServer() {
 
                 const tables = await result.json();
 
-                if (tables.data.length === 0) {
+                /** @ts-ignore */
+                if (tables?.data?.length === 0) {
                     return {
                         content: [{
                             type: "text",
@@ -98,6 +97,7 @@ export function startServer() {
                     };
                 }
 
+                /** @ts-ignore */
                 const foundTables = `Found the following tables in database ${database}: ${tables.data.map((table: any) => table.name).join(", ")}`;
 
                 return {
