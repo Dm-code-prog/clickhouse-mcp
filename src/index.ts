@@ -128,16 +128,11 @@ export function startServer() {
             try {
                 const query = params.query.trim();
 
-                // Sanitize query - ensure it's a SELECT statement
-                if (query.toUpperCase().includes('DELETE') ||
-                    query.toUpperCase().includes('INSERT') ||
-                    query.toUpperCase().includes('UPDATE') ||
-                    query.toUpperCase().includes('ALTER') ||
-                    query.toUpperCase().includes('CREATE') ||
-                    query.toUpperCase().includes('DROP') ||
-                    query.toUpperCase().includes('TRUNCATE') ||
-                    query.toUpperCase().includes('GRANT') ||
-                    query.toUpperCase().includes('REVOKE')) {
+                // Sanitize query - allow only SELECT, SHOW, and DESCRIBE statements
+                const isSelect = /^\s*(SELECT|SHOW|DESCRIBE)/i.test(query);
+                const hasForbiddenCommands = /\b(DELETE|INSERT|UPDATE|ALTER|CREATE|DROP|TRUNCATE|GRANT|REVOKE)\b/i.test(query);
+
+                if (!isSelect || hasForbiddenCommands) {
                     return {
                         content: [{
                             type: "text",
