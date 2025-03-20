@@ -129,9 +129,15 @@ export function startServer() {
                 const query = params.query.trim();
 
                 // Sanitize query - ensure it's a SELECT statement
-                if (!query.toUpperCase().startsWith('SELECT') &&
-                    !query.toUpperCase().startsWith('SHOW') &&
-                    !query.toUpperCase().startsWith('DESCRIBE')) {
+                if (query.toUpperCase().includes('DELETE') ||
+                    query.toUpperCase().includes('INSERT') ||
+                    query.toUpperCase().includes('UPDATE') ||
+                    query.toUpperCase().includes('ALTER') ||
+                    query.toUpperCase().includes('CREATE') ||
+                    query.toUpperCase().includes('DROP') ||
+                    query.toUpperCase().includes('TRUNCATE') ||
+                    query.toUpperCase().includes('GRANT') ||
+                    query.toUpperCase().includes('REVOKE')) {
                     return {
                         content: [{
                             type: "text",
