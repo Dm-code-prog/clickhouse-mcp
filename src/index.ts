@@ -127,12 +127,10 @@ export function startServer() {
         async (params) => {
             try {
                 const query = params.query.trim();
+        
+                const hasForbiddenCommands = /.*(update|delete|create|drop|alter|truncate|optimize|rename|attach|detach|merge|grant|revoke|replace|materialize)\b\s+/i.test(query);
 
-                // Sanitize query - allow only SELECT, SHOW, and DESCRIBE statements
-                const isSelect = /^\s*(SELECT|SHOW|DESCRIBE)/i.test(query);
-                const hasForbiddenCommands = /\b(DELETE|INSERT|UPDATE|ALTER|CREATE|DROP|TRUNCATE|GRANT|REVOKE)\b/i.test(query);
-
-                if (!isSelect || hasForbiddenCommands) {
+                if (hasForbiddenCommands) {
                     return {
                         content: [{
                             type: "text",
