@@ -167,8 +167,6 @@ export function startServer() {
 
     server.connect(new StdioServerTransport());
 
-    console.log("ClickHouse MCP server started");
-
     return server;
 }
 
